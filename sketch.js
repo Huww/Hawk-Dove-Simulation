@@ -27,13 +27,13 @@ let speedSlider;
 let seedCheckbox;
 let betaSlider;
 let hawkSlider;
+let gridSlider;
 
 function setup() {
 	createCanvas(600, 401);
 	initialiseHTML();
 	resetSim();
 	//res is used to scale the size of the grid with the canvas size
-	res = (height-1) / gridSize;
 	console.log(width, height);
 }
 
@@ -43,14 +43,16 @@ function draw() {
 
 	betaText.html('Beta: ' + str(betaSlider.value()));
 	hawkText.html('Hawks: ' + str(floor(hawkSlider.value()*100)) + '%');
+	gridText.html('Grid Size: ' + str(gridSlider.value()));
 	//General Text
 	fill(0);
 	textSize(18);
 
 	text('Generation: ' + str(generation), width - 180, 30);
-	text('Beta: ' + str(beta), width - 180, 60);
-	text('Doves: ' + str(round(((1-(hawkCount / pow(gridSize,2)))* 100)*10)/10) + "%", width - 180, 90);
-	text('Hawks: ' + str(round(((hawkCount / pow(gridSize,2))* 100)*10)/10) + "%", width - 180, 120);
+	text('Grid Size: ' + str(gridSize), width - 180, 60);
+	text('Beta: ' + str(beta), width - 180, 90);
+	text('Doves: ' + str(round(((1-(hawkCount / pow(gridSize,2)))* 100)*10)/10) + "%", width - 180, 120);
+	text('Hawks: ' + str(round(((hawkCount / pow(gridSize,2))* 100)*10)/10) + "%", width - 180, 150);
 
 	//Drawing the grid to the screen
 	for (var i=0; i < gridSize; i++) {
@@ -158,6 +160,7 @@ function startStop(){
 
 //Resets the simulation
 function resetSim() {
+	gridSize = gridSlider.value();
 	generation = 1;
 	if(play) startStop();
 	hawkCount = 0;
@@ -169,6 +172,8 @@ function resetSim() {
 	grid = create2DArray(gridSize,gridSize);
 	//Generate the initial positions of the hawks
 	hawkList = generateHawks(hawkProb);
+
+	res = (height-1) / gridSize;
 
 	//Assign each position in the grid as either a hawk or dove
 	let count = 0;
@@ -201,21 +206,26 @@ function initialiseHTML() {
 
 	txt1 = createDiv('Speed: ');
   txt1.position(5, height + 35);
-	speedSlider = createSlider(2,25,10);
-	speedSlider.position(90, height + 35);
+	speedSlider = createSlider(2,25,12);
+	speedSlider.position(95, height + 35);
 
 	betaSlider = createSlider(0,10,2.2,0.1);
-	betaSlider.position(90, height + 60);
+	betaSlider.position(95, height + 60);
 	betaText = createDiv('Beta: ' + str(betaSlider.value()));
   betaText.position(5, height + 60);
 
 	hawkSlider = createSlider(0,1,0.2,0.01);
-	hawkSlider.position(90, height + 85);
-	hawkText = createDiv('Beta: ' + str(betaSlider.value()));
+	hawkSlider.position(95, height + 85);
+	hawkText = createDiv('Hawks: ' + str(floor(hawkSlider.value()*100)) + '%');
   hawkText.position(5, height + 85);
 
+	gridSlider = createSlider(10,60,40,5);
+	gridSlider.position(95, height + 110);
+	gridText = createDiv('Grid Size: ' + str(gridSlider.value()));
+  gridText.position(5, height + 110);
+
 	seedCheckbox = createCheckbox('Use the same random seed?', false);
-	seedCheckbox.position(5, height + 110);
+	seedCheckbox.position(5, height + 135);
 }
 
 
