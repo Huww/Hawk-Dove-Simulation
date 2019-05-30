@@ -4,7 +4,6 @@ Hawk = 0 - Dove = 1
 0| 1-B  2
 1|  0		1
 */
-
 //Variables for the simulation
 let gridSize = 40;
 let hawkProb = 0.2;
@@ -13,45 +12,37 @@ let beta = 2.2;
 //The matrix of values for the scores
 let strats = [[1-beta,2],[0,1]];
 
-//Used to slow the rate at which the generations are iterated through (high = slower)
-let rate = 10;
-
 let res;
 let grid;
 let counter = 0;
 let generation = 1;
 let hawkCount = 0;
+let play = false;
+
+//HTML Stuff
+let startButton;
+let nextButton;
+let resetButton;
+let speedSlider;
+let seedCheckbox;
+let betaSlider;
+let hawkSlider;
 
 function setup() {
-	randomSeed(1);
 	createCanvas(600, 401);
-	//Create the initial grid
-	grid = create2DArray(gridSize,gridSize);
-	//Generate the initial positions of the hawks
-	hawkList = generateHawks(hawkProb);
-
-	//Assign each position in the grid as either a hawk or dove
-	let count = 0;
-	for (var i=0; i < gridSize; i++) {
-		for (var j=0; j < gridSize; j++) {
-			if(hawkList.indexOf(count) != -1) {
-				grid[i][j] = 0;
-				hawkCount++;
-			} else {
-				grid[i][j] = 1;
-			}
-			count++;
-		}
-	}
+	initialiseHTML();
+	resetSim();
 	//res is used to scale the size of the grid with the canvas size
-	res = (canvas.height-1) / gridSize;
-
+	res = (height-1) / gridSize;
+	console.log(width, height);
 }
 
 //Executes every frame
 function draw() {
   background(255);
 
+	betaText.html('Beta: ' + str(betaSlider.value()));
+	hawkText.html('Hawks: ' + str(floor(hawkSlider.value()*100)) + '%');
 	//General Text
 	fill(0);
 	textSize(18);
@@ -74,8 +65,8 @@ function draw() {
 	}
 
 	//Runs the next generation
-	if(counter % rate == 0){
-		//nextGen();
+	if(counter % (27-speedSlider.value()) == 0 && play){
+		nextGen();
 	}
 	counter++;
 
@@ -151,6 +142,83 @@ function keyPressed() {
 		nextGen();
   }
 }
+
+//Starts and stops the simulation
+function startStop(){
+	if(play) {
+		startButton.html('Start');
+		play = false;
+	} else {
+		startButton.html('Stop');
+		beta = betaSlider.value();
+		strats = [[1-beta,2],[0,1]];
+		play = true;
+	}
+}
+
+//Resets the simulation
+function resetSim() {
+	generation = 1;
+	if(play) startStop();
+	hawkCount = 0;
+	if(seedCheckbox.checked()) randomSeed(1);
+	beta = betaSlider.value();
+	hawkProb = hawkSlider.value();
+	strats = [[1-beta,2],[0,1]];
+	//Create the initial grid
+	grid = create2DArray(gridSize,gridSize);
+	//Generate the initial positions of the hawks
+	hawkList = generateHawks(hawkProb);
+
+	//Assign each position in the grid as either a hawk or dove
+	let count = 0;
+	for (var i=0; i < gridSize; i++) {
+		for (var j=0; j < gridSize; j++) {
+			if(hawkList.indexOf(count) != -1) {
+				grid[i][j] = 0;
+				hawkCount++;
+			} else {
+				grid[i][j] = 1;
+			}
+			count++;
+		}
+	}
+}
+
+//Initialise all HTML elements
+function initialiseHTML() {
+	startButton = createButton('Start');
+	startButton.position(5, height + 10);
+	startButton.mousePressed(startStop);
+
+	nextButton = createButton('Next');
+	nextButton.position(50, height + 10)
+	nextButton.mousePressed(nextGen);
+
+	resetButton = createButton('Reset');
+	resetButton.position(95, height + 10)
+	resetButton.mousePressed(resetSim);
+
+	txt1 = createDiv('Speed: ');
+  txt1.position(5, height + 35);
+	speedSlider = createSlider(2,25,10);
+	speedSlider.position(90, height + 35);
+
+	betaSlider = createSlider(0,10,2.2,0.1);
+	betaSlider.position(90, height + 60);
+	betaText = createDiv('Beta: ' + str(betaSlider.value()));
+  betaText.position(5, height + 60);
+
+	hawkSlider = createSlider(0,1,0.2,0.01);
+	hawkSlider.position(90, height + 85);
+	hawkText = createDiv('Beta: ' + str(betaSlider.value()));
+  hawkText.position(5, height + 85);
+
+	seedCheckbox = createCheckbox('Use the same random seed?', false);
+	seedCheckbox.position(5, height + 110);
+}
+
+
 //Creates a matrix/2D Array
 function create2DArray(rows, cols) {
 	let arr = new Array(rows);
