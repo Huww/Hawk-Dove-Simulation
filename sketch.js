@@ -71,6 +71,25 @@ function draw() {
 		nextGen();
 	}
 	counter++;
+	fill(0);
+	textSize(12);
+	text('100', width - 185, height - 220);
+	text('0', width - 172, height - 30);
+	textSize(14);
+	text('%', width - 190, height - 125);
+
+	text('Doves', width - 140, height-10);
+	text('Hawks', width - 80, height-10);
+
+	text(str(round(((1-(hawkCount / pow(gridSize,2)))* 100)*10)/10) + "%", width - 135, height - 32 - (1-(hawkCount / pow(gridSize,2)))* 200);
+	text(str(round(((hawkCount / pow(gridSize,2))* 100)*10)/10) + "%", width - 75, height - 32 - (hawkCount / pow(gridSize,2))* 200);
+
+	text('Hawks', width - 80, height-10);
+
+	rect(width - 160, height-230, 2, 200);
+	rect(width - 160, height-30, 140, 2);
+	rect(width - 80, height - 30 - (hawkCount / pow(gridSize,2))* 200, 40, (hawkCount / pow(gridSize,2))* 200);
+	rect(width - 140, height - 30 - (1-(hawkCount / pow(gridSize,2)))* 200, 40, (1-(hawkCount / pow(gridSize,2)))* 200);
 
 }
 
@@ -141,7 +160,7 @@ function maxNeighbour(grid, x, y) {
 function keyPressed() {
   //Spacebar
   if (keyCode === 32) {
-		nextGen();
+		nextPressed();
   }
 }
 
@@ -198,7 +217,7 @@ function initialiseHTML() {
 
 	nextButton = createButton('Next');
 	nextButton.position(50, height + 10)
-	nextButton.mousePressed(nextGen);
+	nextButton.mousePressed(nextPressed);
 
 	resetButton = createButton('Reset');
 	resetButton.position(95, height + 10)
@@ -228,7 +247,12 @@ function initialiseHTML() {
 	seedCheckbox.position(5, height + 135);
 }
 
-
+//Called when the next button is pressed - used to update beta
+function nextPressed() {
+	beta = betaSlider.value();
+	strats = [[1-beta,2],[0,1]];
+	nextGen();
+}
 //Creates a matrix/2D Array
 function create2DArray(rows, cols) {
 	let arr = new Array(rows);
